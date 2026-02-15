@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handwriting to PDF Pro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+  --bg1:#fdf4ff;
+  --bg2:#e0f7ff;
+  --card:#ffffffcc;
+  --primary:#c084fc;
+  --secondary:#f9a8d4;
+  --text:#333;
+}
+
+body.dark{
+  --bg1:#1e1e2f;
+  --bg2:#2a2a40;
+  --card:#2c2c3f;
+  --primary:#8b5cf6;
+  --secondary:#ec4899;
+  --text:#fff;
+}
+
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);
+  transition:0.3s;
+}
+
+.container{
+  text-align:center;
+  padding:40px 20px;
+}
+
+.card{
+  background:var(--card);
+  backdrop-filter:blur(15px);
+  border-radius:25px;
+  padding:30px;
+  max-width:600px;
+  margin:auto;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
+
+h1{
+  color:var(--primary);
+}
+
+.upload-area{
+  border:2px dashed var(--primary);
+  padding:30px;
+  border-radius:20px;
+  cursor:pointer;
+  margin:20px 0;
+  transition:0.3s;
+}
+
+.upload-area:hover{
+  background:rgba(255,255,255,0.4);
+}
+
+button{
+  background:linear-gradient(45deg,var(--primary),var(--secondary));
+  border:none;
+  padding:12px 25px;
+  border-radius:30px;
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+  margin:10px;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+img{
+  max-width:100%;
+  margin-top:20px;
+  border-radius:15px;
+}
+
+.toggle{
+  position:fixed;
+  top:15px;
+  right:15px;
+  background:none;
+  border:none;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.loader{
+  display:none;
+  margin:20px;
+}
+
+@media(max-width:600px){
+  .card{padding:20px;}
+}
+</style>
+</head>
+
+<body>
+
+<button class="toggle" onclick="toggleMode()">🌙</button>
+
+<div class="container">
+  <div class="card">
+    <h1>📝 Handwriting to PDF Converter</h1>
+    <p>Upload your handwritten image and convert it into a professional PDF ✨</p>
+
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+      📂 Click or Drag & Drop your handwriting image
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+    <div class="loader" id="loader">⏳ Processing...</div>
+
+    <img id="preview" style="display:none">
+
+    <br>
+    <button onclick="convertToPDF()">Convert to PDF 📄</button>
+  </div>
+</div>
+
+<script>
+let uploadedImage=null;
+
+document.getElementById("fileInput").addEventListener("change",function(e){
+  const file=e.target.files[0];
+  if(file){
+    const reader=new FileReader();
+    reader.onload=function(event){
+      uploadedImage=event.target.result;
+      const img=document.getElementById("preview");
+      img.src=uploadedImage;
+      img.style.display="block";
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+async function convertToPDF(){
+  if(!uploadedImage){
+    alert("Please upload an image first!");
+    return;
+  }
+
+  document.getElementById("loader").style.display="block";
+
+  const { jsPDF } = window.jspdf;
+  const pdf=new jsPDF();
+
+  const img=new Image();
+  img.src=uploadedImage;
+
+  img.onload=function(){
+    pdf.addImage(img,'JPEG',10,10,190,0);
+    pdf.save("Handwriting.pdf");
+    document.getElementById("loader").style.display="none";
+  }
+}
+
+function toggleMode(){
+  document.body.classList.toggle("dark");
+}
+</script>
+
+</body>
+</html>
